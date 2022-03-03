@@ -12,7 +12,7 @@ https://documenter.getpostman.com/view/2157092/TzkzrzNU
 
 ### Документация
 
-тут будет ссылка на документацию
+https://docs.google.com/document/d/1Gen-3wN5TXiwdS-p3p19vLgBGc6sbqMRnrUI4rzfd_g/
 
 ### Развертывание
 
