@@ -63,10 +63,6 @@ class PictureDetailView(generics.RetrieveDestroyAPIView):
     serializer_class = ListPictureSerializer
     lookup_field = 'id'
 
-    def delete(self, request, *args, **kwargs):
-        os.remove(f'site_media/{self.get_object().name}')
-        return super().delete(request, *args, **kwargs)
-
 
 class ResizePicture(generics.RetrieveAPIView, generics.CreateAPIView):
     """
