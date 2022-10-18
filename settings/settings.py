@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     # 3rd party
     'rest_framework',
     'django_cleanup.apps.CleanupConfig',
+    'drf_yasg',
 
     # my apps
     'image_app',

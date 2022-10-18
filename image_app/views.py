@@ -64,7 +64,7 @@ class PictureDetailView(generics.RetrieveDestroyAPIView):
     lookup_field = 'id'
 
 
-class ResizePicture(generics.RetrieveAPIView, generics.CreateAPIView):
+class ResizePicture(generics.CreateAPIView):
     """
     (POST) Изменение размера изображения
     """
@@ -73,9 +73,6 @@ class ResizePicture(generics.RetrieveAPIView, generics.CreateAPIView):
 
     def get_object(self):
         return get_object_or_404(Picture, id=self.kwargs['id'])
-
-    def get(self, request, *args, **kwargs):
-        return Response(ListPictureSerializer(self.get_object(), many=False).data)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
