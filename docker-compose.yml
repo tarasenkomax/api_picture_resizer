@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:13.0-alpine
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=$DB_NAME
+      - POSTGRES_PASSWORD=$DB_PASS
+      - POSTGRES_USER=$DB_USER
+    ports:
+      - '15432:5432'
+
+  backend:
+    build: .
+#    restart: always
+    env_file:
+      - .env
+    command: python manage.py runserver 0.0.0.0:8000
+    entrypoint: wait-for db:5432 -- ./entrypoint.sh
+    depends_on:
+      - db
+    ports:
+      - '8000:8000'
+
+volumes:
+  pgdata:
+
