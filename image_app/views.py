@@ -11,7 +11,16 @@ from image_app.models import Picture
 from image_app.serializers import ListPictureSerializer, CreatePictureSerializer, ResizePictureSerializer
 
 
-class PictureView(generics.ListAPIView, generics.CreateAPIView):
+class CreateDirForImagesMixin:
+    @staticmethod
+    def create_m_site_media_dir():
+        try:
+            os.makedirs("m/site_media/")
+        except FileExistsError:
+            pass
+
+
+class PictureView(generics.ListAPIView, generics.CreateAPIView, CreateDirForImagesMixin):
     """
     (GET) Получение списка доступных изображений
     (POST) Добавление изображений
@@ -26,6 +35,7 @@ class PictureView(generics.ListAPIView, generics.CreateAPIView):
         """Создание объекта изображения"""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        self.create_m_site_media_dir()
         if request.FILES.get('file'):
             request_picture = Image.open(request.FILES.get('file'))
             picture = Picture.objects.create(name=request.FILES.get('file').name,
@@ -42,7 +52,7 @@ class PictureView(generics.ListAPIView, generics.CreateAPIView):
 
             parsed_url = urlparse(serializer.data.get('url'))
             img_name = os.path.basename(parsed_url.path)
-            img.save(f'site_media/{img_name}')
+            img.save(f'm/site_media/{img_name}')
 
             picture = Picture.objects.create(
                 name=img_name,
@@ -64,7 +74,7 @@ class PictureDetailView(generics.RetrieveDestroyAPIView):
     lookup_field = 'id'
 
 
-class ResizePicture(generics.CreateAPIView):
+class ResizePicture(generics.CreateAPIView, CreateDirForImagesMixin):
     """
     (POST) Изменение размера изображения
     """
@@ -75,6 +85,7 @@ class ResizePicture(generics.CreateAPIView):
         return get_object_or_404(Picture, id=self.kwargs['id'])
 
     def create(self, request, *args, **kwargs):
+        self.create_m_site_media_dir()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         parent_picture = Image.open(self.get_object().picture)
@@ -83,7 +94,7 @@ class ResizePicture(generics.CreateAPIView):
         resized_image = parent_picture.resize((width, height))
         file_extension = os.path.splitext(str(self.get_object().picture))[1]  # формат родительского изображения
         name_image = f'{self.get_object().name}_{serializer.data["width"] or 0}_{serializer.data["height"] or 0}{file_extension}'
-        resized_image.save(f'site_media/{name_image}')
+        resized_image.save(f'm/site_media/{name_image}')
 
         picture = Picture.objects.create(
             name=name_image,
@@ -91,5 +102,5 @@ class ResizePicture(generics.CreateAPIView):
             picture=f"site_media/{name_image}",
             width=width,
             height=height,
-            parent_picture=self.kwargs['id'])
+            parent_picture=self.get_object())
         return Response(ListPictureSerializer(picture, many=False).data)
