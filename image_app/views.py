@@ -42,7 +42,7 @@ class PictureView(generics.ListAPIView, generics.CreateAPIView, CreateDirForImag
                                              picture=request.FILES.get('file'),
                                              width=request_picture.size[0],
                                              height=request_picture.size[1])
-            return Response(ListPictureSerializer(picture, many=False).data)
+            return Response(ListPictureSerializer(picture, many=False).data, status=status.HTTP_201_CREATED)
         elif serializer.data.get('url'):
             resp = requests.get(serializer.data.get('url'), stream=True).raw
             try:
@@ -60,7 +60,7 @@ class PictureView(generics.ListAPIView, generics.CreateAPIView, CreateDirForImag
                 picture=f"site_media/{img_name}",
                 width=img.size[0],
                 height=img.size[1], )
-            return Response(ListPictureSerializer(picture, many=False).data)
+            return Response(ListPictureSerializer(picture, many=False).data, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
