@@ -17,9 +17,11 @@ class PictureViewTest(TestCase):
             'width': 256,
             'height': 256,
         }
-        Picture.objects.create(**self.test_picture_data)
+        picture = Picture.objects.create(**self.test_picture_data)
+        picture_2 = Picture.objects.create(**self.test_picture_data_2)
+        self.picture_id = picture.id
 
-    def test_view_url_exists_at_desired_location(self):
+    def test_pictures_list_view(self):
         response = self.client.get('/api/images/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -32,7 +34,7 @@ class PictureViewTest(TestCase):
 
     def test_create_picture_from_link(self):
         response = self.client.post(
-            '/api/images/',
+            path='/api/images/',
             format='json',
             data=self.test_picture_data_2,
         )
@@ -47,26 +49,17 @@ class PictureViewTest(TestCase):
         pass
 
     def test_create_picture_with_two_empty_fields(self):
-        response = self.client.post('/api/images/', format='json', data={})
+        response = self.client.post(
+            path='/api/images/',
+            format='json',
+            data={})
         #  self.assertEqual(response.data['__empty__'], 'Empty fields')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_picture_with_two_filled_fields(self):
         pass
 
-
-class PictureDetailView(TestCase):
-    def setUp(self):
-        self.test_picture_data = {
-            'name': 'Picture name',
-            'url': 'https://autoprodaga.com/auto/auto_red.jpg',
-            'width': 500,
-            'height': 600,
-        }
-        picture = Picture.objects.create(**self.test_picture_data)
-        self.picture_id = picture.id
-
-    def test_view_url_exists_at_desired_location(self):
+    def test_delete_picture_view(self):
         response = self.client.delete(f'/api/images/{self.picture_id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
@@ -74,28 +67,16 @@ class PictureDetailView(TestCase):
         response = self.client.delete(f'/api/images/{999}/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-
-class ResizePicture(TestCase):
-    def setUp(self):
-        self.test_picture_data = {
-            'name': 'Picture name',
-            'url': 'https://autoprodaga.com/auto/auto_red.jpg',
-            'width': 500,
-            'height': 600,
-        }
-        Picture.objects.create(**self.test_picture_data)
-
-    def test_resize_valid_picture(self):
+    def test_resize_picture(self):
         pass
 
     def test_resize_invalid_picture(self):
         response = self.client.post(
-            '/api/images/999/resize/',
+            path='/api/images/999/resize/',
             format='json',
             data={
                 'width': 400,
                 'height': 300,
             },
         )
-
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

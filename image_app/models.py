@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 from urllib.parse import urlparse
 
 import requests
@@ -7,6 +8,7 @@ from django.db import models
 from django.utils.safestring import mark_safe
 
 from image_app.exceptions import OpenImageFromException
+from image_app.utils import resize_and_save_picture
 
 
 class PictureManager(models.Manager):
@@ -52,16 +54,51 @@ class Picture(models.Model):
     picture = models.ImageField(upload_to='site_media/', verbose_name='Изображение')
     width = models.PositiveIntegerField(verbose_name='Ширина')
     height = models.PositiveIntegerField(verbose_name='Высота')
-    parent_picture = models.ForeignKey('Picture', null=True, blank=True, on_delete=models.CASCADE,
-                                       verbose_name='Родительское изображение', related_name='parent')
+    parent_picture = models.ForeignKey(
+        to='Picture',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        verbose_name='Родительское изображение',
+        related_name='parent',
+    )
+
+    def __str__(self):
+        return self.name
+
+    def create_resized_image(
+            self,
+            width: Optional[int] = None,
+            height: Optional[int] = None,
+    ) -> 'Picture':
+        """ Создать дубликат изображения с новыми размерами """
+        parent_picture = self.picture
+        new_width = width or int(parent_picture.size[0])
+        new_height = height or int(parent_picture.size[1])
+        parent_picture_extension = os.path.splitext(str(parent_picture))[1]
+        image_name = f'{self.name}_{width or 0}_{height or 0}{parent_picture_extension}'
+
+        resize_and_save_picture(
+            picture=Image.open(parent_picture),
+            width=width,
+            height=height,
+            image_name=image_name,
+        )
+
+        picture_obj = Picture.objects.create(
+            name=image_name,
+            url=self.url,
+            picture=f"site_media/{image_name}",
+            width=new_width,
+            height=new_height,
+            parent_picture=self,
+        )
+        return picture_obj
 
     def image_tag(self):
         return mark_safe(f'<img src="{self.picture.url}" style= height:100px; object-fit:cover"/>')
 
     image_tag.short_description = "Изображение"
-
-    def __str__(self):
-        return self.name
 
     objects = PictureManager()
 

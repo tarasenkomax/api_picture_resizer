@@ -9,13 +9,9 @@ class ListPictureSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'url', 'picture', 'width', 'height', 'parent_picture']
 
 
-class CreatePictureSerializer(serializers.ModelSerializer):
+class CreatePictureSerializer(serializers.Serializer):
     file = serializers.ImageField(required=False)
     url = serializers.URLField(required=False)
-
-    class Meta:
-        model = Picture
-        fields = ['file', 'url']
 
     def validate(self, data):
         url = data.get('url')
@@ -27,13 +23,9 @@ class CreatePictureSerializer(serializers.ModelSerializer):
         return data
 
 
-class ResizePictureSerializer(serializers.ModelSerializer):
+class ResizePictureSerializer(serializers.Serializer):
     height = serializers.IntegerField(default=0)
     width = serializers.IntegerField(default=0)
-
-    class Meta:
-        model = Picture
-        fields = ['height', 'width']
 
     def validate(self, data):
         height = data.get('height')
