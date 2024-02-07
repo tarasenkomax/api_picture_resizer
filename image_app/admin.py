@@ -3,7 +3,7 @@ from .models import Picture
 
 
 class PictureAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'url', 'picture', 'width', 'height', 'parent_picture')
+    list_display = ('id', 'name', 'url', 'image_tag', 'width', 'height', 'parent_picture')
     list_display_links = ('name',)
 
 
