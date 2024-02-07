@@ -1,29 +1,39 @@
 import os
 from urllib.parse import urlparse
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-from rest_framework import generics
-from rest_framework.response import Response
-from PIL import Image
+
 import requests
+from PIL import Image
+from django.shortcuts import get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, mixins
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 from image_app.models import Picture
 from image_app.serializers import ListPictureSerializer, CreatePictureSerializer, ResizePictureSerializer
 
 
-class PictureView(generics.ListAPIView, generics.CreateAPIView):
-    """
-    (GET) Получение списка доступных изображений
-    (POST) Добавление изображений
-    """
+class PictureViewSet(mixins.CreateModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.DestroyModelMixin,
+                     mixins.ListModelMixin,
+                     GenericViewSet):
     queryset = Picture.objects.all()
-    serializer_class = CreatePictureSerializer
 
-    def get(self, request, *args, **kwargs):
-        return Response(ListPictureSerializer(self.get_queryset(), many=True).data)
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return ListPictureSerializer
+        elif self.action == 'create':
+            return CreatePictureSerializer
+        elif self.action == 'resize':
+            return ResizePictureSerializer
 
-    def create(self, request, *args, **kwargs):
-        """Создание объекта изображения"""
+    serializer_class = ListPictureSerializer
+
+    @swagger_auto_schema(request_body=CreatePictureSerializer, responses={'201': ListPictureSerializer()})
+    def create(self, request, *args, **kwargs) -> Response:
+        """ Создание объекта изображения """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -51,20 +61,8 @@ class PictureView(generics.ListAPIView, generics.CreateAPIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class PictureDetailView(generics.RetrieveDestroyAPIView):
-    """
-    (GET) Получение детальной информации о изображении
-    (DEL) Удаление
-    """
-    queryset = Picture.objects.all()
-    serializer_class = ListPictureSerializer
-    lookup_field = 'id'
-
-
 class ResizePictureView(generics.CreateAPIView):
-    """
-    (POST) Изменение размера изображения
-    """
+    """ Изменение размера изображения """
     lookup_field = 'id'
     serializer_class = ResizePictureSerializer
 

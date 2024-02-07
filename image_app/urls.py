@@ -1,12 +1,15 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 
-from image_app.views import PictureView, PictureDetailView, ResizePictureView
+from image_app.views import ResizePictureView, PictureViewSet
 
 app_name = "image_app"
 
-urlpatterns = [
-    path('', PictureView.as_view(), name='picture_list'),
-    path('<int:id>/', PictureDetailView.as_view(), name='picture_detail'),
-    path('<int:id>/resize', ResizePictureView.as_view(), name='picture_resize'),
+router = DefaultRouter()
 
+router.register('', PictureViewSet, basename='picture')
+
+urlpatterns = [
+    path('<int:id>/resize', ResizePictureView.as_view(), name='picture_resize'),
 ]
+urlpatterns += router.urls

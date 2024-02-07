@@ -8,7 +8,7 @@ SECRET_KEY = 'django-insecure-bll(f*-e=gsl_&uk7r3f&d0p7vs_q(nxgfazl2&%90%@3cj#88
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -17,15 +17,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # 3rd party
+    # 3rd
     'rest_framework',
     'django_cleanup.apps.CleanupConfig',
     'drf_yasg',
-
-    # my apps
+]
+CUSTOM_APPS = [
     'image_app',
 ]
+
+INSTALLED_APPS += CUSTOM_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

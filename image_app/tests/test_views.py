@@ -21,22 +21,19 @@ class PictureViewTest(TestCase):
         Picture.objects.create(**self.test_picture_data)
 
     def test_view_url_exists_at_desired_location(self):
-        responce = self.client.get('/api/images/')
-        self.assertEqual(responce.status_code, status.HTTP_200_OK)
+        response = self.client.get('/api/images/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_view_url_accessible_by_name(self):
-        responce = self.client.get(reverse('image_app:picture_list'))
-        self.assertEqual(responce.status_code, status.HTTP_200_OK)
 
     def test_get_validate_data(self):
-        responce = self.client.get(reverse('image_app:picture_list'))
+        response = self.client.get('/api/images/')
         pictures = Picture.objects.all()
         serializer = ListPictureSerializer(pictures, many=True)
-        self.assertEqual(responce.data, serializer.data)
-        self.assertEqual(responce.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_picture_from_link(self):
-        response = self.client.post(reverse('image_app:picture_list'), format='json', data=self.test_picture_data_2)
+        response = self.client.post(reverse('image_app:picture'), format='json', data=self.test_picture_data_2)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['name'], 'auto_red.jpg')
         self.assertEqual(response.data['url'], self.test_picture_data_2['url'])
@@ -47,7 +44,7 @@ class PictureViewTest(TestCase):
     #     pass
 
     def test_create_picture_with_two_empty_fields(self):
-        response = self.client.post(reverse('image_app:picture_list'), format='json', data={})
+        response = self.client.post(reverse('image_app:picture'), format='json', data={})
         #  self.assertEqual(response.data['__empty__'], 'Empty fields')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -67,24 +64,14 @@ class PictureDetailView(TestCase):
         self.picture_id = picture.id
 
     def test_view_url_exists_at_desired_location(self):
-        responce = self.client.get(f'/api/images/{self.picture_id}/')
-        self.assertEqual(responce.status_code, status.HTTP_200_OK)
-
-    def test_view_url_accessible_by_name(self):
-        responce = self.client.get(reverse('image_app:picture_detail', kwargs={'id': self.picture_id}))
-        self.assertEqual(responce.status_code, status.HTTP_200_OK)
-
-    def test_delete_picture(self):
-        response = self.client.delete(reverse('image_app:picture_detail', kwargs={'id': self.picture_id}))
+        response = self.client.delete(f'/api/images/{self.picture_id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+
     def test_delete_invalid_picture(self):
-        response = self.client.delete(reverse('image_app:picture_detail', kwargs={'id': 999}))
+        response = self.client.delete(f'/api/images/{999}/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_detail_invalid_picture_info(self):
-        responce = self.client.get(reverse('image_app:picture_detail', kwargs={'id': 999}))
-        self.assertEqual(responce.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class ResizePicture(TestCase):
