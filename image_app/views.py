@@ -47,7 +47,7 @@ class PictureViewSet(mixins.CreateModelMixin,
                 return Response(data={'error': 'Unable to open image'}, status=status.HTTP_400_BAD_REQUEST, )
             return Response(data=ListPictureSerializer(picture, many=False).data, status=status.HTTP_201_CREATED, )
 
-    @swagger_auto_schema(request_body=ResizePictureSerializer, responses={'200': ListPictureSerializer()})
+    @swagger_auto_schema(request_body=ResizePictureSerializer, responses={'201': ListPictureSerializer()})
     @action(detail=True, methods=['POST'])
     def resize(self, request, *args, **kwargs):
         serializer = ResizePictureSerializer(data=request.data)
