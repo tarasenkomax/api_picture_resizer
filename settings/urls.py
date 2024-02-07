@@ -6,6 +6,8 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
+from image_app.urls import router
+
 schema_view = get_schema_view(
     openapi.Info(
         title="PICTURE RESIZER",
@@ -21,7 +23,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/images/', include('image_app.urls')),
+    path('api/images/', include(router.urls)),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

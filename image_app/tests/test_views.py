@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.urls import reverse
 from rest_framework import status
 
 from image_app.models import Picture
@@ -14,16 +13,15 @@ class PictureViewTest(TestCase):
             'height': 240,
         }
         self.test_picture_data_2 = {
-            'url': 'https://autoprodaga.com/auto/auto_red.jpg',
-            'width': 300,
-            'height': 225,
+            'url': 'https://cs14.pikabu.ru/avatars/503/x503842-1468369487.png',
+            'width': 256,
+            'height': 256,
         }
         Picture.objects.create(**self.test_picture_data)
 
     def test_view_url_exists_at_desired_location(self):
         response = self.client.get('/api/images/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
 
     def test_get_validate_data(self):
         response = self.client.get('/api/images/')
@@ -33,23 +31,28 @@ class PictureViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_picture_from_link(self):
-        response = self.client.post(reverse('image_app:picture'), format='json', data=self.test_picture_data_2)
+        response = self.client.post(
+            '/api/images/',
+            format='json',
+            data=self.test_picture_data_2,
+        )
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['name'], 'auto_red.jpg')
+        self.assertEqual(response.data['name'], 'x503842-1468369487.png')
         self.assertEqual(response.data['url'], self.test_picture_data_2['url'])
         self.assertEqual(response.data['width'], self.test_picture_data_2['width'])
         self.assertEqual(response.data['height'], self.test_picture_data_2['height'])
 
-    # def test_create_picture_from_file(self):
-    #     pass
+    def test_create_picture_from_file(self):
+        pass
 
     def test_create_picture_with_two_empty_fields(self):
-        response = self.client.post(reverse('image_app:picture'), format='json', data={})
+        response = self.client.post('/api/images/', format='json', data={})
         #  self.assertEqual(response.data['__empty__'], 'Empty fields')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # def test_create_picture_with_two_filled_fields(self):
-    #     pass
+    def test_create_picture_with_two_filled_fields(self):
+        pass
 
 
 class PictureDetailView(TestCase):
@@ -67,11 +70,9 @@ class PictureDetailView(TestCase):
         response = self.client.delete(f'/api/images/{self.picture_id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-
     def test_delete_invalid_picture(self):
         response = self.client.delete(f'/api/images/{999}/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
 
 
 class ResizePicture(TestCase):
@@ -84,11 +85,17 @@ class ResizePicture(TestCase):
         }
         Picture.objects.create(**self.test_picture_data)
 
-    # def test_resize_picture(self):
-    #     pass
+    def test_resize_valid_picture(self):
+        pass
 
     def test_resize_invalid_picture(self):
-        response = self.client.post(reverse('image_app:picture_resize', kwargs={'id': 999}), format='json',
-                                    data={'width': 400, 'height': 300})
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        response = self.client.post(
+            '/api/images/999/resize/',
+            format='json',
+            data={
+                'width': 400,
+                'height': 300,
+            },
+        )
 
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
