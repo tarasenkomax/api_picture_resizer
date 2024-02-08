@@ -16,6 +16,7 @@ class PictureViewSet(mixins.CreateModelMixin,
                      mixins.DestroyModelMixin,
                      mixins.ListModelMixin,
                      GenericViewSet, ):
+    """ Сет изображений. Предоставляет API для всех действий с изображениями """
     queryset = Picture.objects.all()
 
     def get_serializer_class(self):
@@ -50,6 +51,7 @@ class PictureViewSet(mixins.CreateModelMixin,
     @swagger_auto_schema(request_body=ResizePictureSerializer, responses={'201': ListPictureSerializer()})
     @action(detail=True, methods=['POST'])
     def resize(self, request, *args, **kwargs):
+        """ Изменение размера текущего изображения и сохранение как отдельный объект 'Picture' """
         serializer = ResizePictureSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 

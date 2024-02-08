@@ -71,7 +71,7 @@ class Picture(models.Model):
             width: Optional[int] = None,
             height: Optional[int] = None,
     ) -> 'Picture':
-        """ Создать дубликат изображения с новыми размерами """
+        """ Изменение размера текущего изображения и сохранение как отдельный объект 'Picture' """
         parent_picture = self.picture
         new_width = width or int(parent_picture.size[0])
         new_height = height or int(parent_picture.size[1])
