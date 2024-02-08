@@ -7,7 +7,7 @@ from PIL import Image
 from django.db import models
 from django.utils.safestring import mark_safe
 
-from image_app.exceptions import OpenImageFromException
+from image_app.exceptions import OpenImageFromUrlException
 from image_app.utils import resize_and_save_picture
 
 
@@ -19,7 +19,7 @@ class PictureManager(models.Manager):
         try:
             img = Image.open(resp)
         except IOError:
-            raise OpenImageFromException
+            raise OpenImageFromUrlException
 
         parsed_url = urlparse(url)
         img_name = os.path.basename(parsed_url.path)
