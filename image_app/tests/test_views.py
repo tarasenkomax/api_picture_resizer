@@ -32,7 +32,7 @@ class PictureViewTest(TestCase):
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_create_picture_from_link(self):
+    def test_create_picture_from_url(self):
         response = self.client.post(
             path='/api/images/',
             format='json',
