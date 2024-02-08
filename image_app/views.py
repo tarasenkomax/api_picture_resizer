@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from image_app.exceptions import OpenImageFromException
+from image_app.exceptions import OpenImageFromUrlException
 from image_app.models import Picture
 from image_app.serializers import ListPictureSerializer, CreatePictureSerializer, ResizePictureSerializer
 
@@ -43,7 +43,7 @@ class PictureViewSet(mixins.CreateModelMixin,
         elif serializer.data.get('url'):
             try:
                 picture = Picture.objects.create_to_url(serializer.data.get('url'))
-            except OpenImageFromException:
+            except OpenImageFromUrlException:
                 return Response(data={'error': 'Unable to open image'}, status=status.HTTP_400_BAD_REQUEST, )
             return Response(data=ListPictureSerializer(picture, many=False).data, status=status.HTTP_201_CREATED, )
 
