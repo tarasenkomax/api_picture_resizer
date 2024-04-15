@@ -1,14 +1,17 @@
-from PIL import Image
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import mixins
-from rest_framework import status
+from PIL import Image
+from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from image_app.exceptions import OpenImageFromUrlException
 from image_app.models import Picture
-from image_app.serializers import ListPictureSerializer, CreatePictureSerializer, ResizePictureSerializer
+from image_app.serializers import (
+    CreatePictureSerializer,
+    ListPictureSerializer,
+    ResizePictureSerializer,
+)
 
 
 class PictureViewSet(mixins.CreateModelMixin,

@@ -3,9 +3,9 @@ from typing import Optional
 from urllib.parse import urlparse
 
 import requests
-from PIL import Image
 from django.db import models
 from django.utils.safestring import mark_safe
+from PIL import Image
 
 from image_app.exceptions import OpenImageFromUrlException
 from image_app.utils import resize_and_save_picture

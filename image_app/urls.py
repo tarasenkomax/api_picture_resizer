@@ -7,4 +7,3 @@ app_name = "image_app"
 router = DefaultRouter()
 
 router.register('', PictureViewSet, basename='picture')
-

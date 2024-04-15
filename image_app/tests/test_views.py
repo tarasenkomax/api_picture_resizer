@@ -18,7 +18,7 @@ class PictureViewTest(TestCase):
             'height': 256,
         }
         picture = Picture.objects.create(**self.test_picture_data)
-        picture_2 = Picture.objects.create(**self.test_picture_data_2)
+        Picture.objects.create(**self.test_picture_data_2)
         self.picture_id = picture.id
 
     def test_pictures_list_view(self):
