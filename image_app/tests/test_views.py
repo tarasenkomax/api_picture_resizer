@@ -52,8 +52,8 @@ class PictureViewTest(TestCase):
         response = self.client.post(
             path='/api/images/',
             format='json',
-            data={})
-        #  self.assertEqual(response.data['__empty__'], 'Empty fields')
+            data={},
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_picture_with_two_filled_fields(self):
