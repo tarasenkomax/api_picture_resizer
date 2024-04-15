@@ -21,3 +21,7 @@ https://documenter.getpostman.com/view/2157092/TzkzrzNU
 1. Создать файл с переменным окружения согласно шаблону .env.sample в корне проекта
 2. Собрать контейнер `docker-compose build`
 3. Запустить контейнер `docker-compose up`
+
+### Тесты
+1. Подключиться к контейнеру `backend`
+2. Выполнить команду `python manage.py test`
