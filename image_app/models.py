@@ -3,12 +3,13 @@ from typing import Optional
 from urllib.parse import urlparse
 
 import requests
-from PIL import Image
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models
 from django.utils.safestring import mark_safe
+from PIL import Image
 
 from image_app.exceptions import OpenImageFromUrlException
+from image_app.mixins import CreateUpdateMixin
 from image_app.utils import resize_and_save_picture
 from settings.settings import MEDIA_ROOT
 
@@ -25,7 +26,7 @@ class PictureManager(models.Manager):
 
         parsed_url = urlparse(url)
         img_name = os.path.basename(parsed_url.path)
-        img.save(f'{MEDIA_ROOT}/{img_name}')  # todo сгенерировать строку вместо имени
+        img.save(f'{MEDIA_ROOT}/{img_name}')
 
         picture_obj = Picture.objects.create(
             name=img_name,
@@ -41,7 +42,7 @@ class PictureManager(models.Manager):
         """ Создание изображения по файлу """
         request_picture_size = Image.open(file).size
         picture = Picture.objects.create(
-            name=file.name,  # todo сгенерировать строку вместо имени
+            name=file.name,
             picture=file,
             width=request_picture_size[0],
             height=request_picture_size[1],
@@ -49,7 +50,7 @@ class PictureManager(models.Manager):
         return picture
 
 
-class Picture(models.Model):  # todo created_at, updated_at
+class Picture(CreateUpdateMixin):
     """ Изображение """
     name = models.CharField(max_length=100, verbose_name='Название')
     url = models.URLField(null=True, blank=True, verbose_name='Ссылка на изображение')
@@ -60,9 +61,9 @@ class Picture(models.Model):  # todo created_at, updated_at
         to='Picture',
         null=True,
         blank=True,
-        on_delete=models.CASCADE,  # todo удаляет каскадно потомков, переделать
+        on_delete=models.SET_NULL,
         verbose_name='Родительское изображение',
-        related_name='parent',
+        related_name='childs',
     )
 
     def __str__(self):
@@ -88,7 +89,7 @@ class Picture(models.Model):  # todo created_at, updated_at
         )
 
         picture_obj = Picture.objects.create(
-            name=image_name,  # todo сгенерировать строку вместо имени
+            name=image_name,
             url=self.url,
             picture=image_name,
             width=new_width,
