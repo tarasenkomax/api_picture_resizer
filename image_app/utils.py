@@ -1,5 +1,7 @@
 from PIL import Image
 
+from settings.settings import MEDIA_ROOT
+
 
 def resize_and_save_picture(
         picture: Image,
@@ -16,4 +18,4 @@ def resize_and_save_picture(
     :return: None
     """
     resized_image = picture.resize((width, height))
-    resized_image.save(f'm/site_media/{image_name}')
+    resized_image.save(f'{MEDIA_ROOT}/{image_name}')

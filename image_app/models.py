@@ -3,13 +3,14 @@ from typing import Optional
 from urllib.parse import urlparse
 
 import requests
+from PIL import Image
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models
 from django.utils.safestring import mark_safe
-from PIL import Image
 
 from image_app.exceptions import OpenImageFromUrlException
 from image_app.utils import resize_and_save_picture
+from settings.settings import MEDIA_ROOT
 
 
 class PictureManager(models.Manager):
@@ -24,12 +25,12 @@ class PictureManager(models.Manager):
 
         parsed_url = urlparse(url)
         img_name = os.path.basename(parsed_url.path)
-        img.save(f'm/site_media/{img_name}')
+        img.save(f'{MEDIA_ROOT}/{img_name}')  # todo сгенерировать строку вместо имени
 
         picture_obj = Picture.objects.create(
             name=img_name,
             url=url,
-            picture=f"site_media/{img_name}",
+            picture=img_name,
             width=img.size[0],
             height=img.size[1],
         )
@@ -40,7 +41,7 @@ class PictureManager(models.Manager):
         """ Создание изображения по файлу """
         request_picture_size = Image.open(file).size
         picture = Picture.objects.create(
-            name=file.name,
+            name=file.name,  # todo сгенерировать строку вместо имени
             picture=file,
             width=request_picture_size[0],
             height=request_picture_size[1],
@@ -48,18 +49,18 @@ class PictureManager(models.Manager):
         return picture
 
 
-class Picture(models.Model):
+class Picture(models.Model):  # todo created_at, updated_at
     """ Изображение """
     name = models.CharField(max_length=100, verbose_name='Название')
     url = models.URLField(null=True, blank=True, verbose_name='Ссылка на изображение')
-    picture = models.ImageField(upload_to='site_media/', verbose_name='Изображение')
+    picture = models.ImageField(upload_to='', verbose_name='Изображение')
     width = models.PositiveIntegerField(verbose_name='Ширина')
     height = models.PositiveIntegerField(verbose_name='Высота')
     parent_picture = models.ForeignKey(
         to='Picture',
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE,  # todo удаляет каскадно потомков, переделать
         verbose_name='Родительское изображение',
         related_name='parent',
     )
@@ -68,9 +69,9 @@ class Picture(models.Model):
         return self.name
 
     def create_resized_image(
-            self,
-            width: Optional[int] = None,
-            height: Optional[int] = None,
+        self,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
     ) -> 'Picture':
         """ Изменение размера текущего изображения и сохранение как отдельный объект 'Picture' """
         parent_picture = self.picture
@@ -87,9 +88,9 @@ class Picture(models.Model):
         )
 
         picture_obj = Picture.objects.create(
-            name=image_name,
+            name=image_name,  # todo сгенерировать строку вместо имени
             url=self.url,
-            picture=f"site_media/{image_name}",
+            picture=image_name,
             width=new_width,
             height=new_height,
             parent_picture=self,

@@ -15,10 +15,6 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
     execute_from_command_line(sys.argv)
-    try:
-        os.makedirs("m/site_media/")
-    except FileExistsError:
-        pass
 
 
 if __name__ == '__main__':

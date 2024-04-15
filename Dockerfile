@@ -13,4 +13,9 @@ WORKDIR $PROJECT_PATH
 RUN pip install --upgrade pip
 COPY requirements.txt /app/
 RUN pip install -r requirements.txt
+
+RUN mkdir -p /app/media
+RUN mkdir -p /app/logs
+VOLUME ["/app/logs", "/app/media"]
+
 COPY . $PROJECT_PATH
