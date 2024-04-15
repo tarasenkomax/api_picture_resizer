@@ -3,6 +3,7 @@ from typing import Optional
 from urllib.parse import urlparse
 
 import requests
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models
 from django.utils.safestring import mark_safe
 from PIL import Image
@@ -35,7 +36,7 @@ class PictureManager(models.Manager):
         return picture_obj
 
     @staticmethod
-    def create_to_file(file) -> 'Picture':
+    def create_to_file(file: InMemoryUploadedFile) -> 'Picture':
         """ Создание изображения по файлу """
         request_picture_size = Image.open(file).size
         picture = Picture.objects.create(
