@@ -42,14 +42,14 @@ class PictureViewSet(mixins.CreateModelMixin,
         if request.FILES.get('file'):
             request_file = request.FILES.get('file')
             picture = Picture.objects.create_to_file(request_file)
-            return Response(data=ListPictureSerializer(picture, many=False).data, status=status.HTTP_201_CREATED, )
+            return Response(data=ListPictureSerializer(picture, many=False).data, status=status.HTTP_201_CREATED)
 
         elif serializer.data.get('url'):
             try:
                 picture = Picture.objects.create_to_url(serializer.data.get('url'))
             except OpenImageFromUrlException:
-                return Response(data={'error': 'Unable to open image'}, status=status.HTTP_400_BAD_REQUEST, )
-            return Response(data=ListPictureSerializer(picture, many=False).data, status=status.HTTP_201_CREATED, )
+                return Response(data={'error': 'Unable to open image'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data=ListPictureSerializer(picture, many=False).data, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(request_body=ResizePictureSerializer, responses={'201': ListPictureSerializer()})
     @action(detail=True, methods=['POST'])
@@ -67,4 +67,4 @@ class PictureViewSet(mixins.CreateModelMixin,
             height=height,
         )
 
-        return Response(data=ListPictureSerializer(picture, many=False).data, status=status.HTTP_201_CREATED, )
+        return Response(data=ListPictureSerializer(picture, many=False).data, status=status.HTTP_201_CREATED)
